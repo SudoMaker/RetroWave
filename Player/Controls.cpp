@@ -39,9 +39,10 @@ void RetroWavePlayer::term_attr_load() {
 
 int RetroWavePlayer::term_read_char() {
 	uint8_t buf;
-//	term_attr_disable_buffering();
-//	set_nonblocking(STDIN_FILENO);
+	set_nonblocking(STDIN_FILENO);
 	ssize_t rc = read(STDIN_FILENO, &buf, 1);
+	set_nonblocking(STDIN_FILENO, false);
+
 	if (rc == 1)
 		return buf;
 	else
@@ -52,7 +53,6 @@ void RetroWavePlayer::term_clear() {
 	printf("\033[H");
 	printf("\033[2J");
 	printf("\033[3J");
-//	fflush(stdout);
 }
 
 void RetroWavePlayer::term_move_0_0() {

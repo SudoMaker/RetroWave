@@ -47,15 +47,9 @@ void RetroWavePlayer::init() {
 	init_retrowave();
 	init_tinyvgm();
 	init_term();
-
-//	puts("Init done");
 }
 
 void RetroWavePlayer::init_term() {
-	set_nonblocking(STDIN_FILENO);
-	set_nonblocking(STDOUT_FILENO);
-	set_nonblocking(STDERR_FILENO);
-
 	term_attr_save();
 	term_attr_disable_buffering();
 }
