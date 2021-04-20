@@ -191,6 +191,8 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 		current_track = i+1;
 		total_tracks = file_list.size();
 
+		term_clear();
+
 		printf("Now playing (%zu/%zu): %s\n", current_track, total_tracks, current_file);
 
 		if (!load_file(cur_file)) {

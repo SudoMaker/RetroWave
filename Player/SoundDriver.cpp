@@ -232,6 +232,7 @@ check_command:
 				puts("== Paused ==");
 			} else {
 				puts("== Resumed ==");
+				term_clear();
 			}
 			break;
 		case NEXT:
@@ -295,6 +296,8 @@ void RetroWavePlayer::timespec_add(timespec &addee, timespec adder) {
 		addee.tv_nsec -= 999999999;
 	}
 }
+
+
 
 
 

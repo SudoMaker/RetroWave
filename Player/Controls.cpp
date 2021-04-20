@@ -50,11 +50,13 @@ int RetroWavePlayer::term_read_char() {
 
 void RetroWavePlayer::term_clear() {
 	printf("\033[H");
-//	fflush(stdout);
 	printf("\033[2J");
-//	fflush(stdout);
 	printf("\033[3J");
-	fflush(stdout);
+//	fflush(stdout);
+}
+
+void RetroWavePlayer::term_move_0_0() {
+	printf("\033[H");
 }
 
 void RetroWavePlayer::controls_parse_key_commands() {
@@ -113,10 +115,11 @@ void RetroWavePlayer::single_frame_hook() {
 				puts("== Resume ==");
 				single_step = false;
 				done = true;
+				term_clear();
 				clock_gettime(RETROWAVE_PLAYER_TIME_REF, &sleep_end);
 				break;
 			case SINGLE_FRAME:
-				puts("== Next frame ==");
+//				puts("== Next frame ==");
 				done = true;
 				single_step = true;
 				break;

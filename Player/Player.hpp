@@ -145,6 +145,7 @@ public:
 
 	// OSD
 	static void term_clear();
+	static void term_move_0_0();
 	void osd_show_regmap_sn76489();
 	void osd_show_regmaps();
 	void osd_show_metadata();

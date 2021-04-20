@@ -34,7 +34,7 @@ void RetroWavePlayer::osd_show_regmap_sn76489() {
 	if (!regmap_sn76489.used)
 		return;
 
-	printf("Register map of SN76489:\n\n");
+	printf("Register map of SN76489:\033[K\n\033[K\n");
 
 	const char *reg_desc = "";
 
@@ -65,13 +65,13 @@ void RetroWavePlayer::osd_show_regmap_sn76489() {
 			break;
 	}
 
-	printf("Last reg: 0x%x [%s]\n", regmap_sn76489.last_reg, reg_desc);
-	printf("Freq: 0x%03x 0x%03x 0x%03x\n", regmap_sn76489.freq[0], regmap_sn76489.freq[1], regmap_sn76489.freq[2]);
-	printf("Att : 0x%x   0x%x   0x%x\n", regmap_sn76489.att[0], regmap_sn76489.att[1], regmap_sn76489.att[2]);
-	printf("Noise ctrl: 0x%x\n", regmap_sn76489.noise_ctrl);
-	printf("Noise att : 0x%x\n", regmap_sn76489.noise_att);
+	printf("Last reg: 0x%x [%s]\033[K\n", regmap_sn76489.last_reg, reg_desc);
+	printf("Freq: 0x%03x 0x%03x 0x%03x\033[K\n", regmap_sn76489.freq[0], regmap_sn76489.freq[1], regmap_sn76489.freq[2]);
+	printf("Att : 0x%x   0x%x   0x%x\033[K\n", regmap_sn76489.att[0], regmap_sn76489.att[1], regmap_sn76489.att[2]);
+	printf("Noise ctrl: 0x%x\033[K\n", regmap_sn76489.noise_ctrl);
+	printf("Noise att : 0x%x\033[K\n", regmap_sn76489.noise_att);
 
-	puts("\n");
+	printf("\033[K\n\033[K\n");
 }
 
 void RetroWavePlayer::osd_show_regmaps() {
@@ -81,7 +81,7 @@ void RetroWavePlayer::osd_show_regmaps() {
 		if (rmnit != regmap_name.end())
 			rmn = rmnit->second.data();
 
-		printf("Register map %02x [%s]:\n", it.first, rmn);
+		printf("Register map %02x [%s]:\033[K\n", it.first, rmn);
 
 		auto &refreshed_list = reg_map_refreshed_list[it.first];
 
@@ -91,15 +91,15 @@ void RetroWavePlayer::osd_show_regmaps() {
 
 			for (int j=0; j<16; j++) {
 				if (refreshed_list.find(i+j) != refreshed_list.end())
-					printf("\x1b[01;32m%02x\x1b[0m ", it.second[i+j]);
+					printf("\033[01;32m%02x\033[0m ", it.second[i+j]);
 				else
 					printf("%02x ", it.second[i+j]);
 			}
-			puts("");
+			printf("\033[K\n");
 		}
 
 		reg_map_refreshed_list[it.first].clear();
-		puts("\n");
+		printf("\033[K\n\033[K\n");
 	}
 }
 
@@ -108,47 +108,47 @@ void RetroWavePlayer::osd_show_metadata() {
 		printf("Title: %s", metadata.title.c_str());
 		if (!metadata.title_jp.empty())
 			printf(" / %s", metadata.title_jp.c_str());
-		puts("");
+		printf("\033[K\n");
 	}
 
 	if (!metadata.album.empty()) {
 		printf("Album: %s", metadata.album.c_str());
 		if (!metadata.album_jp.empty())
 			printf(" / %s", metadata.album_jp.c_str());
-		puts("");
+		printf("\033[K\n");
 	}
 
 	if (!metadata.composer.empty()) {
 		printf("Composer: %s", metadata.composer.c_str());
 		if (!metadata.composer_jp.empty())
 			printf(" / %s", metadata.composer_jp.c_str());
-		puts("");
+		printf("\033[K\n");
 	}
 
 	if (!metadata.system_name.empty()) {
 		printf("System: %s", metadata.system_name.c_str());
 		if (!metadata.system_name_jp.empty())
 			printf(" / %s", metadata.system_name_jp.c_str());
-		puts("");
+		printf("\033[K\n");
 	}
 
 	if (!metadata.release_date.empty())
-		printf("Release date: %s\n", metadata.release_date.c_str());
+		printf("Release date: %s\033[K\n", metadata.release_date.c_str());
 
 	if (!metadata.converter.empty())
-		printf("Converter: %s\n", metadata.converter.c_str());
+		printf("Converter: %s\033[K\n", metadata.converter.c_str());
 
 	if (!metadata.note.empty())
-		printf("Note: %s\n", metadata.note.c_str());
+		printf("Note: %s\033[K\n", metadata.note.c_str());
 
-	puts("");
+	printf("\033[K\n");
 }
 
 void RetroWavePlayer::osd_show() {
-	term_clear();
-	puts("===== RetroWave Player =====\n");
+	term_move_0_0();
+	printf("===== RetroWave Player =====\033[K\n\033[K\n");
 
-	printf("Now playing (%zu/%zu): %s\n\n", current_track, total_tracks, current_file);
+	printf("Now playing (%zu/%zu): %s\033[K\n\033[K\n", current_track, total_tracks, current_file);
 
 	if (osd_show_meta)
 		osd_show_metadata();
@@ -162,13 +162,10 @@ void RetroWavePlayer::osd_show() {
 
 	if (total_samples) {
 		auto [th, tm, ts] = sec2hms(total_samples / sample_rate);
-		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d (%zu/%zu)\n", h, m, s, th, tm, ts, played_samples, total_samples);
+		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d (%zu/%zu)\033[K\n", h, m, s, th, tm, ts, played_samples, total_samples);
 	} else {
-		printf("Playing: %02d:%02d:%02d (%zu)\n", h, m, s, played_samples);
+		printf("Playing: %02d:%02d:%02d (%zu)\033[K\n", h, m, s, played_samples);
 	}
-
-//	puts("\u001b[s");
-//	puts("\u001b[u");
 
 }
 
