@@ -61,7 +61,7 @@ Each board uses the same pins on the 40 pin Raspberry header (physical pin numbe
 Yes, the boards are stackable. And yes, different boards can function at the same time.
 
 ## Software
-We provide a library for accessing the boards, a reference VGM player that uses the library, and a modified DOSBox-X that supports using RetroWave boards for sound output.
+We provide a library for accessing the boards, a reference command-line VGM player that uses the library, and a modified DOSBox-X that supports using RetroWave boards for sound output.
 
 All of them are free software.
 
@@ -91,16 +91,18 @@ Source files are in the `Player` directory.
 ![Screenshot_20210420_213349](https://user-images.githubusercontent.com/34613827/115404756-35312b00-a220-11eb-8dbe-0e69879cb04c.png)
 
 #### Binary releases
-See the Releases section.
+See the [Releases](https://github.com/SudoMaker/RetroWave/releases) section.
 
 Currently built targets:
 - Linux x86_64
 - Linux armhf
+- Linux aarch64
+- MacOS x86_64
 - Windows x86_64 (Windows 7+)
 
 #### Build
 - Ensure you have the build tools, CMake 3.14+ and zlib dev package installed
-- `cd` into the sources directory
+- `cd` into the root path of this repo
 - `mkdir build; cd build; cmake ..; make`
 
 #### Problems
