@@ -63,6 +63,8 @@ Yes, the boards are stackable. And yes, different boards can function at the sam
 ## Software
 We provide a library for accessing the boards, a reference command-line VGM player that uses the library, and a modified DOSBox-X that supports using RetroWave boards for sound output.
 
+The firmware of the USB Adapter is also open sourced: See [here](https://github.com/SudoMaker/RetroWave_USB_Adapter).
+
 All of them are free software.
 
 ### Library
