@@ -4,7 +4,13 @@ Authentic sounds from vintage sound chips, on modern hardware!
 ## Introduction
 RetroWave is a hardware sound board series that uses vintage sound chips and works with modern hardware.
 
-They are in shape of Raspberry HATs, stackable, hackable, can be used on tiny single board computers like the Raspberry Pi, and modern desktop computer with USB ports.
+They are in shape of Raspberry HATs, stackable, hackable, can be used on tiny single board computers like the Raspberry Pi / Jetson Nano, and modern desktop computer with USB ports.
+
+![pic2](https://user-images.githubusercontent.com/34613827/115403406-f2bb1e80-a21e-11eb-870d-8f872d3b3b86.jpg)
+
+![pic3](https://user-images.githubusercontent.com/34613827/115403614-2ac26180-a21f-11eb-85a6-18b21e8c10ba.jpg)
+
+![pic1](https://user-images.githubusercontent.com/34613827/115405273-acff5580-a220-11eb-9b1d-b16763f35a67.jpg)
 
 ## Hardware
 
@@ -12,6 +18,8 @@ They are in shape of Raspberry HATs, stackable, hackable, can be used on tiny si
 
 #### OPL3
 Uses the Yamaha YMF262-M chip.
+
+![EE4A0701](https://user-images.githubusercontent.com/34613827/115404127-9b697e00-a21f-11eb-9cce-84bf7765dd9a.jpg)
 
 #### Mini Blaster
 Under development.
@@ -80,6 +88,8 @@ Source files are in the `Player` directory.
 - Nanoseconds accuracy on Linux/BSD and microseconds accuracy on MacOS 
 - Cool real-time register map visualization!
 
+![Screenshot_20210420_213349](https://user-images.githubusercontent.com/34613827/115404756-35312b00-a220-11eb-8dbe-0e69879cb04c.png)
+
 #### Binary releases
 See the Releases section.
 
@@ -113,6 +123,8 @@ If you are good at Windows APIs, feel free to create a pull request!
    The conhost.exe terminal is extremely laggy when repainting the whole console window. So, OSD refresh rate is set to 1 second and regmap visualization is disabled by default on Windows. If you want to see the register map visualization properly, try using MinTTY as your terminal.
 
 ### DOSBox-X
+![Screenshot_20210420_004920](https://user-images.githubusercontent.com/34613827/115405808-2a2aca80-a221-11eb-8a16-93d76cd51b71.png)
+
 Currently only OPL3 is supported.
 
 For the source files, see [here](https://github.com/SudoMaker/dosbox-x).
