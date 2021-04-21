@@ -17,6 +17,8 @@ They are in shape of Raspberry HATs, stackable, hackable, can be used on tiny si
 ### Boards
 
 #### OPL3
+Now available on [Tindie](https://www.tindie.com/products/sudomaker/retrowave-opl3-sound-card/).
+
 Uses the Yamaha YMF262-M chip.
 
 ![EE4A0701](https://user-images.githubusercontent.com/34613827/115404127-9b697e00-a21f-11eb-9cce-84bf7765dd9a.jpg)
