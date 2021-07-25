@@ -316,7 +316,7 @@ int main(int argc, char **argv) {
 
 	cxxopts::Options options("Retrowave_Player", "Retrowave_Player - Player for the Retrowave series.");
 
-	std::string device_type, device_path, spi_cs_gpio;
+	std::string device_type, device_path, spi_cs_gpio, test_type;
 	std::vector<std::string> positional_args;
 
 #if defined (__CYGWIN__)
@@ -342,6 +342,7 @@ int main(int argc, char **argv) {
 		("i", "OSD refresh interval in ns, 0 to disable", cxxopts::value<size_t>(player.osd_ratelimit_thresh)->default_value(std::to_string(osd_default_refresh_interval)))
 		("m", "Show metadata in OSD (1/0)", cxxopts::value<int>(player.osd_show_meta)->default_value(std::to_string(1)))
 		("r", "Show chip regs in OSD (1/0)", cxxopts::value<int>(player.osd_show_regs)->default_value(std::to_string(osd_default_show_reg)))
+		("T", "Test to run (\"help\" for a list)",  cxxopts::value<std::string>(test_type)->default_value(""))
 
 		;
 
@@ -356,7 +357,7 @@ int main(int argc, char **argv) {
 	try {
 		auto cmd = options.parse(argc, argv);
 
-		if (cmd.count("help") || positional_args.empty()) {
+		if (cmd.count("help") || (test_type.empty() && positional_args.empty())) {
 			std::cout << options.help({"Main"});
 			ShowHelpExtra();
 			return 0;
@@ -427,8 +428,70 @@ int main(int argc, char **argv) {
 
 	usleep(100 * 1000);
 
-	player.play(positional_args);
-	puts("Done playing!");
+	if (test_type.empty()) {
+		player.play(positional_args);
+		puts("Done playing!");
+	} else {
+		const std::unordered_map<std::string, std::function<void()>> tests = {
+			{"opl3_sine", [&](){
+				printf("OPL3 Sine Wave Test\n");
+				printf("From https://www.vogons.org/viewtopic.php?t=55181\n");
+				puts("");
+
+				const std::vector<std::pair<uint8_t, uint8_t>> data = {
+					{0x20, 0x03},
+					{0x23, 0x01},
+					{0x40, 0x2f},
+					{0x43, 0x00},
+					{0x61, 0x10},
+					{0x63, 0x10},
+					{0x80, 0x00},
+					{0x83, 0x00},
+					{0xa0, 0x44},
+					{0xb0, 0x12},
+					{0xc0, 0xfe},
+					{0xb0, 0x32}
+				};
+
+				for (auto &it : data) {
+					printf("Write reg: 0x%02x 0x%02x\n", it.first, it.second);
+					retrowave_opl3_emit_port0(&player.rtctx, it.first, it.second);
+				}
+
+				printf("Sleeping 1 sec...\n");
+				sleep(1);
+
+				const uint8_t last_reg[2] = {0x60, 0xf0};
+
+				printf("Write reg: 0x%02x 0x%02x\n", last_reg[0], last_reg[1]);
+				retrowave_opl3_emit_port0(&player.rtctx, last_reg[0], last_reg[1]);
+
+				printf(
+					"If you hear sine wave you have a real OPL3 or very accurate clone,\n"
+					"otherwise you have OPL clone.\n"
+					"Press Ctrl-C to close program.\n"
+				);
+
+				sleep(500);
+			}
+			},
+		};
+
+		auto it = tests.find(test_type);
+
+		if (it == tests.end()) {
+			printf("Available tests:\n");
+
+			for (auto &it2 : tests) {
+				std::cout << it2.first << "\n";
+			}
+		} else {
+			std::cout << "Running test: " << it->first << "\n";
+			it->second();
+		}
+	}
+
+
 	player.do_exit(0);
 
 	return 0;
