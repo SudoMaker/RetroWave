@@ -187,6 +187,10 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 
 		term_clear();
 
+		reg_map.clear();
+		reg_map_refreshed_list.clear();
+		regmap_sn76489.used = false;
+
 		printf("Now playing (%zu/%zu): %s\n", current_track, total_tracks, current_file);
 
 		if (!load_file(cur_file)) {
