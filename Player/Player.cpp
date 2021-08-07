@@ -149,12 +149,12 @@ retry_verify_file:
 
 				if (zlib_rc >= 0) {
 					auto out_size = io_size - zlib_strm.avail_out;
-					printf("info: zlib decompressed %lu bytes\n", out_size);
+//					printf("info: zlib decompressed %lu bytes\n", out_size);
 					zlib_decompressed_size += out_size;
 
 					if (zlib_rc == Z_STREAM_END) {
 						inflateEnd(&zlib_strm);
-						printf("info: zlib decompress done, total %zu bytes\n", zlib_decompressed_size);
+//						printf("info: zlib decompress done, total %zu bytes\n", zlib_decompressed_size);
 						zlib_decompress_buf.resize(zlib_decompressed_size);
 						std::swap(file_buf, zlib_decompress_buf);
 						goto retry_verify_file;
