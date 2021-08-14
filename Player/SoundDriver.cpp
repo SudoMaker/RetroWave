@@ -201,8 +201,10 @@ int RetroWavePlayer::flush_and_sleep(uint32_t sleep_samples) {
 	flush_chips();
 
 	played_samples += sleep_samples;
+	last_slept_samples = sleep_samples;
 
 	uint64_t t = round(1000000000.0 * sleep_samples / sample_rate);
+	last_slept_usecs = t;
 
 	if (osd_ratelimit_thresh) {
 		osd_ratelimited_time += t;

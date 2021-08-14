@@ -263,7 +263,10 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 void RetroWavePlayer::playback_reset() {
 	playback_done = false;
 	played_samples = 0;
+	last_slept_samples = 0;
 	total_samples = 0;
+	last_slept_usecs = 0;
+
 	metadata = Metadata();
 	tinyvgm_destroy_gd3(&gd3_info);
 	tinyvgm_reset(&tvc);

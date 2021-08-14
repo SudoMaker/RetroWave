@@ -108,7 +108,8 @@ public:
 	size_t current_track = 0, total_tracks = 0;
 
 	// Playback stats
-	size_t played_samples = 0, total_samples = 0;
+	size_t played_samples = 0, last_slept_samples = 0, total_samples = 0;
+	uint64_t last_slept_usecs = 0;
 	bool playback_done = false;
 
 	// Metadata
