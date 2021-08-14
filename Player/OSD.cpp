@@ -160,13 +160,24 @@ void RetroWavePlayer::osd_show() {
 
 	auto [h, m, s] = sec2hms(played_samples / sample_rate);
 
-	if (total_samples) {
-		auto [th, tm, ts] = sec2hms(total_samples / sample_rate);
-		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d +%011.6lfms (%zu/%zu +%05zu)\033[K\n", h, m, s, th, tm, ts, ((double)last_slept_usecs / 1000000.0), played_samples, total_samples, last_slept_samples);
-	} else {
-		printf("Playing: %02d:%02d:%02d +%011.6lfms (%zu +%05zu)\033[K\n", h, m, s, ((double)last_slept_usecs / 1000000.0), played_samples, last_slept_samples);
+	const char *samples_color = "\033[01;32m"; // Green
+
+	if (last_slept_samples % 2) {
+		samples_color = "\033[01;33m";
 	}
 
+	if (labs((long)last_last_slept_samples - (long)last_slept_samples) == 1) {
+		samples_color = "\033[01;31m";
+	}
+
+	if (total_samples) {
+		auto [th, tm, ts] = sec2hms(total_samples / sample_rate);
+		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d +%011.6lfms (%zu/%zu %s+%05zu\033[0m)\033[K\n", h, m, s, th, tm, ts, ((double)last_slept_usecs / 1000000.0), played_samples, total_samples, samples_color, last_slept_samples);
+	} else {
+		printf("Playing: %02d:%02d:%02d +%011.6lfms (%zu %s+%05zu\033[0m)\033[K\n", h, m, s, ((double)last_slept_usecs / 1000000.0), played_samples, samples_color, last_slept_samples);
+	}
+
+	last_last_slept_samples = last_slept_samples;
 }
 
 

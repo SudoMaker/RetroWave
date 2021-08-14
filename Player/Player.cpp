@@ -264,6 +264,7 @@ void RetroWavePlayer::playback_reset() {
 	playback_done = false;
 	played_samples = 0;
 	last_slept_samples = 0;
+	last_last_slept_samples = 0;
 	total_samples = 0;
 	last_slept_usecs = 0;
 
