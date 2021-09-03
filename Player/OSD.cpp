@@ -176,7 +176,7 @@ void RetroWavePlayer::osd_show() {
 		last_secs = s;
 	}
 
-	printf("Bandwidth: %06.4lf KiB/s\033[K\n", (double)bytes_per_sec / 1000);
+	printf("Bandwidth: %06.4lf KiB/s\033[K\n\033[2K", (double)bytes_per_sec / 1000);
 
 	printf("\n");
 
