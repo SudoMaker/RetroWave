@@ -109,6 +109,7 @@ public:
 
 	// Playback stats
 	size_t played_samples = 0, last_slept_samples = 0, last_last_slept_samples = 0, total_samples = 0;
+	size_t played_bytes = 0, last_secs = 0, bytes_per_sec = 0;
 	uint64_t last_slept_usecs = 0;
 	bool playback_done = false;
 
@@ -126,7 +127,7 @@ public:
 
 
 public:
-	static std::tuple<int, int, int> sec2hms(int _secs);
+	static std::tuple<size_t, size_t, size_t> sec2hms(size_t _secs);
 	static void set_nonblocking(int fd_, bool __nonblocking = true);
 
 	// Main

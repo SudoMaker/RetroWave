@@ -23,10 +23,10 @@
 
 RetroWavePlayer player;
 
-std::tuple<int, int, int> RetroWavePlayer::sec2hms(int _secs) {
-	int mins = _secs / 60;
-	int secs = _secs % 60;
-	int hrs = mins / 60;
+std::tuple<size_t, size_t, size_t> RetroWavePlayer::sec2hms(size_t _secs) {
+	size_t mins = _secs / 60;
+	size_t secs = _secs % 60;
+	size_t hrs = mins / 60;
 	mins = mins % 60;
 
 	return {hrs, mins, secs};
@@ -236,6 +236,8 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 				break;
 			}
 
+			played_bytes += rc_tv_parse;
+
 			if (playback_done) {
 				break;
 			}
@@ -267,6 +269,8 @@ void RetroWavePlayer::playback_reset() {
 	last_last_slept_samples = 0;
 	total_samples = 0;
 	last_slept_usecs = 0;
+	played_bytes = 0;
+	last_secs = 0;
 
 	metadata = Metadata();
 	tinyvgm_destroy_gd3(&gd3_info);

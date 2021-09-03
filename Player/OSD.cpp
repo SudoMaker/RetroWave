@@ -170,6 +170,16 @@ void RetroWavePlayer::osd_show() {
 		samples_color = "\033[01;31m";
 	}
 
+	if (s - last_secs >= 1) {
+		bytes_per_sec = played_bytes;
+		played_bytes = 0;
+		last_secs = s;
+	}
+
+	printf("Bandwidth: %06.4lf KiB/s\033[K\n", (double)bytes_per_sec / 1000);
+
+	printf("\n");
+
 	if (total_samples) {
 		auto [th, tm, ts] = sec2hms(total_samples / sample_rate);
 		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d +%011.6lfms (%zu/%zu %s+%05zu\033[0m)\033[K\n", h, m, s, th, tm, ts, ((double)last_slept_usecs / 1000000.0), played_samples, total_samples, samples_color, last_slept_samples);
