@@ -125,6 +125,8 @@ public:
 	TinyVGMContext tvc;
 	RetroWaveContext rtctx;
 
+	std::unordered_set<uint8_t> disabled_vgm_commands;
+
 
 public:
 	static std::tuple<size_t, size_t, size_t> sec2hms(size_t _secs);
@@ -137,6 +139,7 @@ public:
 	void init_tinyvgm();
 	void play(const std::vector<std::string>& file_list);
 	void playback_reset();
+	void parse_disabled_vgm_commands(const std::string &str);
 
 	// File I/O
 	bool load_file(const std::string& path);

@@ -32,6 +32,18 @@ std::tuple<size_t, size_t, size_t> RetroWavePlayer::sec2hms(size_t _secs) {
 	return {hrs, mins, secs};
 }
 
+static std::vector<std::string> string_split(const std::string &s, char delim) {
+	std::vector<std::string> result;
+	std::stringstream ss (s);
+	std::string item;
+
+	while (getline(ss, item, delim)) {
+		result.push_back(item);
+	}
+
+	return result;
+}
+
 void RetroWavePlayer::set_nonblocking(int fd_, bool __nonblocking) {
 	int flags = fcntl(fd_, F_GETFL, 0);
 	if (flags == -1)
@@ -63,19 +75,40 @@ void RetroWavePlayer::init_retrowave() {
 void RetroWavePlayer::init_tinyvgm() {
 	tinyvgm_init(&tvc);
 
-	tinyvgm_add_command_callback(&tvc, 0x5a, callback_opl2, this);
-	tinyvgm_add_command_callback(&tvc, 0x5e, callback_opl3_port0, this);
-	tinyvgm_add_command_callback(&tvc, 0x5f, callback_opl3_port1, this);
+	std::unordered_map<uint8_t, int (*)(void *, uint8_t, const void *, uint32_t)> cmd_cb_map = {
+		{0x5a, callback_opl2},
+		{0x5e, callback_opl3_port0},
+		{0x5f, callback_opl3_port1},
+		{0xbd, callback_saa1099},
+		{0x50, callback_sn76489_port0},
+		{0x51, callback_ym2413},
+		{0x30, callback_sn76489_port1},
+	};
 
-	tinyvgm_add_command_callback(&tvc, 0xbd, callback_saa1099, this);
-	tinyvgm_add_command_callback(&tvc, 0x50, callback_sn76489_port0, this);
-	tinyvgm_add_command_callback(&tvc, 0x51, callback_ym2413, this);
-	tinyvgm_add_command_callback(&tvc, 0x30, callback_sn76489_port1, this);
+	for (auto &it : disabled_vgm_commands) {
+		cmd_cb_map.erase(it);
+		printf("info: disabled VGM command %02x\n", it);
+	}
+
+	for (auto &it : cmd_cb_map) {
+		tinyvgm_add_command_callback(&tvc, it.first, it.second, this);
+		printf("debug: VGM cmd %02x handler %p\n", it.first, it.second);
+	}
+
+//	tinyvgm_add_command_callback(&tvc, 0x5a, callback_opl2, this);
+//	tinyvgm_add_command_callback(&tvc, 0x5e, callback_opl3_port0, this);
+//	tinyvgm_add_command_callback(&tvc, 0x5f, callback_opl3_port1, this);
+//
+//	tinyvgm_add_command_callback(&tvc, 0xbd, callback_saa1099, this);
+//	tinyvgm_add_command_callback(&tvc, 0x50, callback_sn76489_port0, this);
+//	tinyvgm_add_command_callback(&tvc, 0x51, callback_ym2413, this);
+//	tinyvgm_add_command_callback(&tvc, 0x30, callback_sn76489_port1, this);
 
 
 	tinyvgm_add_command_callback(&tvc, 0x61, callback_sleep, this);
 	tinyvgm_add_command_callback(&tvc, 0x62, callback_sleep_62, this);
 	tinyvgm_add_command_callback(&tvc, 0x63, callback_sleep_63, this);
+
 	for (int i = 0x70; i <= 0x7f; i++) {
 		tinyvgm_add_command_callback(&tvc, i, callback_sleep_7n, this);
 	}
@@ -84,6 +117,25 @@ void RetroWavePlayer::init_tinyvgm() {
 
 	tinyvgm_add_event_callback(&tvc, TinyVGM_Event_HeaderParseDone, callback_header_done, this);
 	tinyvgm_add_event_callback(&tvc, TinyVGM_Event_PlaybackDone, callback_playback_done, this);
+}
+
+void RetroWavePlayer::parse_disabled_vgm_commands(const std::string &str) {
+	if (str.empty()) {
+		return;
+	}
+
+	auto strs = string_split(str, ',');
+
+	for (auto &it : strs) {
+		uint8_t cmd = strtoul(it.c_str(), nullptr, 16);
+		disabled_vgm_commands.insert(cmd);
+	}
+
+	for (auto &it : disabled_vgm_commands) {
+		printf("info: disabled VGM command 0x%02x\n", it);
+	}
+
+	usleep(500 * 1000);
 }
 
 bool RetroWavePlayer::load_file(const std::string &path) {
@@ -311,24 +363,12 @@ void ShowHelpExtra() {
 #endif
 }
 
-static std::vector<std::string> string_split(const std::string &s, char delim) {
-	std::vector<std::string> result;
-	std::stringstream ss (s);
-	std::string item;
-
-	while (getline(ss, item, delim)) {
-		result.push_back(item);
-	}
-
-	return result;
-}
-
 int main(int argc, char **argv) {
 	signal(SIGINT, int_handler);
 
 	cxxopts::Options options("Retrowave_Player", "Retrowave_Player - Player for the Retrowave series.");
 
-	std::string device_type, device_path, spi_cs_gpio, test_type;
+	std::string device_type, device_path, spi_cs_gpio, test_type, disabled_vgm_cmds;
 	std::vector<std::string> positional_args;
 
 #if defined (__CYGWIN__)
@@ -350,7 +390,7 @@ int main(int argc, char **argv) {
 #ifdef __linux__
 		("g", "GPIO chip,pin for SPI chip select", cxxopts::value<std::string>(spi_cs_gpio)->default_value("0,6"))
 #endif
-
+		("D", "Comma separated list of disabled processing of certain VGM commands in hex", cxxopts::value<std::string>(disabled_vgm_cmds)->default_value(""))
 		("i", "OSD refresh interval in ns, 0 to disable", cxxopts::value<size_t>(player.osd_ratelimit_thresh)->default_value(std::to_string(osd_default_refresh_interval)))
 		("m", "Show metadata in OSD (1/0)", cxxopts::value<int>(player.osd_show_meta)->default_value(std::to_string(1)))
 		("r", "Show chip regs in OSD (1/0)", cxxopts::value<int>(player.osd_show_regs)->default_value(std::to_string(osd_default_show_reg)))
@@ -436,6 +476,7 @@ int main(int argc, char **argv) {
 		puts("Failed to change process priority. You may experience lags.");
 	}
 
+	player.parse_disabled_vgm_commands(disabled_vgm_cmds);
 	player.init();
 
 	usleep(100 * 1000);
