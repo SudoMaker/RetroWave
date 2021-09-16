@@ -51,6 +51,15 @@ int RetroWavePlayer::callback_header_total_samples(void *userp, uint8_t value, c
 	return TinyVGM_OK;
 }
 
+int RetroWavePlayer::callback_header_sn76489(void *userp, uint8_t value, const void *buf, uint32_t len) {
+	auto *ctx = (RetroWavePlayer *)userp;
+
+	assert(len == 4);
+	ctx->sn76489_dual = *((uint32_t *) buf) >> 31;
+
+	return TinyVGM_OK;
+}
+
 int RetroWavePlayer::callback_header_done(void *userp, uint8_t value, const void *buf, uint32_t len) {
 	auto *ctx = (RetroWavePlayer *)userp;
 
@@ -129,6 +138,14 @@ int RetroWavePlayer::callback_opl3_port1(void *userp, uint8_t value, const void 
 	return TinyVGM_OK;
 }
 
+void RetroWavePlayer::sn76489_zero_freq_workaround(uint8_t idx) {
+	auto &cur_regmap = regmap_sn76489[idx];
+
+	if (!cur_regmap.is_volume && cur_regmap.channel < 3 && cur_regmap.freq[cur_regmap.channel] == 0) {
+		retrowave_mastergear_queue_sn76489(&rtctx, 0x81 | (regmap_sn76489[idx].channel << 5));
+	}
+}
+
 int RetroWavePlayer::callback_sn76489_port0(void *userp, uint8_t value, const void *buf, uint32_t len) {
 	auto *ctx = (RetroWavePlayer *)userp;
 
@@ -136,8 +153,16 @@ int RetroWavePlayer::callback_sn76489_port0(void *userp, uint8_t value, const vo
 
 	uint8_t val = ((uint8_t *) buf)[0];
 
-	ctx->regmap_sn76489_insert(val);
+	ctx->regmap_sn76489_insert(0, val);
+	ctx->sn76489_zero_freq_workaround(0);
 	retrowave_mastergear_queue_sn76489(&ctx->rtctx, val);
+
+	if (!ctx->sn76489_dual) {
+		ctx->regmap_sn76489_insert(1, val);
+		ctx->sn76489_zero_freq_workaround(1);
+		retrowave_mastergear_queue_sn76489(&ctx->rtctx, val);
+	}
+
 	ctx->single_frame_hook();
 
 	return TinyVGM_OK;
@@ -150,7 +175,10 @@ int RetroWavePlayer::callback_sn76489_port1(void *userp, uint8_t value, const vo
 
 	uint8_t val = ((uint8_t *) buf)[0];
 
+	ctx->regmap_sn76489_insert(1, val);
+	ctx->sn76489_zero_freq_workaround(1);
 	retrowave_mastergear_queue_sn76489(&ctx->rtctx, val);
+
 	ctx->single_frame_hook();
 
 	return TinyVGM_OK;

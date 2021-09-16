@@ -31,47 +31,163 @@ static std::unordered_map<int, std::string_view> regmap_name = {
 };
 
 void RetroWavePlayer::osd_show_regmap_sn76489() {
-	if (!regmap_sn76489.used)
-		return;
 
-	printf("Register map of SN76489:\033[K\n\033[K\n");
+	for (size_t i=0; i<sizeof(regmap_sn76489)/sizeof(SN76489Registers); i++) {
+		auto &cur_regmap = regmap_sn76489[i];
+		if (!cur_regmap.used) {
+			continue;
+		}
 
-	const char *reg_desc = "";
+		const char *chip_chan;
 
-	switch (regmap_sn76489.last_reg) {
-		case 0:
-			reg_desc = "Tone 1 Freq";
-			break;
-		case 2:
-			reg_desc = "Tone 2 Freq";
-			break;
-		case 1:
-			reg_desc = "Tone 3 Freq";
-			break;
-		case 4:
-			reg_desc = "Tone 1 Att";
-			break;
-		case 6:
-			reg_desc = "Tone 2 Att";
-			break;
-		case 5:
-			reg_desc = "Tone 3 Att";
-			break;
-		case 3:
-			reg_desc = "Noise Ctrl";
-			break;
-		case 7:
-			reg_desc = "Noise Att";
-			break;
+		if (sn76489_dual) {
+			if (i) {
+				chip_chan = "Right";
+			} else {
+				chip_chan = "Left";
+			}
+		} else {
+			chip_chan = "Mono";
+		}
+
+		printf("Register map of SN76489 #%zu (%s):\033[K\n", i, chip_chan);
+
+		const char *col_freq[3] = {"", "", ""};
+		const char *col_att[3] = {"", "", ""};
+		const char *col_noise[2] = {"", ""};
+		const char *col = "\033[01;32m";
+
+		if (cur_regmap.is_volume) {
+			switch (cur_regmap.channel) {
+				case 0:
+					// Tone 1 Att
+					col_att[0] = col;
+					break;
+				case 1:
+					// Tone 2 Att
+					col_att[1] = col;
+					break;
+				case 2:
+					// Tone 3 Att
+					col_att[2] = col;
+					break;
+				case 3:
+					// Noise Att
+					col_noise[1] = col;
+					break;
+			}
+		} else {
+			switch (cur_regmap.channel) {
+				case 0:
+					// Tone 1 Freq
+					col_freq[0] = col;
+					break;
+				case 1:
+					// Tone 2 Freq
+					col_freq[1] = col;
+					break;
+				case 2:
+					// Tone 3 Freq
+					col_freq[2] = col;
+					break;
+				case 3:
+					// Noise Ctrl
+					col_noise[0] = col;
+					break;
+			}
+		}
+
+		double cbuf[3];
+
+		for (size_t j=0; j<3; j++) {
+			cbuf[j] = 3579545.0 / (32 * cur_regmap.freq[j]);
+		}
+
+		printf(
+			"Freq: %s0x%03x\033[0m %s0x%03x\033[0m %s0x%03x\033[0m | "
+			"%s%10.3lf\033[0m %s%10.3lf\033[0m %s%10.3lf\033[0m"
+			"\033[K\n",
+			col_freq[0], cur_regmap.freq[0],
+			col_freq[1], cur_regmap.freq[1],
+			col_freq[2], cur_regmap.freq[2],
+
+			col_freq[0], cbuf[0],
+			col_freq[1], cbuf[1],
+			col_freq[2], cbuf[2]
+		);
+
+		char sbuf[3][16];
+
+		for (size_t j=0; j<3; j++) {
+			if (cur_regmap.att[j] == 0xf) {
+				sprintf(sbuf[j], "     Mute");
+			} else {
+				sprintf(sbuf[j], "  %4d dB", -(cur_regmap.att[j] * 2));
+			}
+		}
+
+		printf(
+			"Att : %s0x%x\033[0m   %s0x%x\033[0m   %s0x%x\033[0m   |  "
+			"%s%s\033[0m  %s%s\033[0m  %s%s\033[0m"
+			"\033[K\n",
+			col_att[0], cur_regmap.att[0],
+			col_att[1], cur_regmap.att[1],
+			col_att[2], cur_regmap.att[2],
+
+			col_att[0], sbuf[0],
+			col_att[1], sbuf[1],
+			col_att[2], sbuf[2]
+		);
+
+		const char *fb_str;
+
+		if ((cur_regmap.noise_ctrl >> 2) & 0x1) {
+			fb_str = "     White";
+		} else {
+			fb_str = "  Periodic";
+		}
+
+		uint8_t sr = cur_regmap.noise_ctrl & 0x3;
+		const char *sr_str;
+
+		switch (sr) {
+			case 0:
+				sr_str = "   N/512";
+				break;
+			case 1:
+				sr_str = "  N/1024";
+				break;
+			case 2:
+				sr_str = "  N/2048";
+				break;
+			case 3:
+				sr_str = "    Tone";
+				break;
+			default:
+				sr_str = "";
+				break;
+		}
+
+		if (cur_regmap.att[3] == 0xf) {
+			sprintf(sbuf[2], "     Mute");
+		} else {
+			sprintf(sbuf[2], "  %4d dB", -(cur_regmap.att[3] * 2));
+		}
+
+		printf(
+			"Noise ctrl: %s0x%x         | %s   %s\033[0m\033[K\n",
+			col_noise[0], cur_regmap.noise_ctrl,
+			fb_str,
+			sr_str
+		);
+
+		printf("Noise att : %s0x%x\033[0m         |  "
+		       "%s%s\033[0m"
+		       "\033[K\n", col_noise[1], cur_regmap.att[3], col_noise[1], sbuf[2]);
+
+		printf("\033[K\n\033[K\n");
 	}
 
-	printf("Last reg: 0x%x [%s]\033[K\n", regmap_sn76489.last_reg, reg_desc);
-	printf("Freq: 0x%03x 0x%03x 0x%03x\033[K\n", regmap_sn76489.freq[0], regmap_sn76489.freq[1], regmap_sn76489.freq[2]);
-	printf("Att : 0x%x   0x%x   0x%x\033[K\n", regmap_sn76489.att[0], regmap_sn76489.att[1], regmap_sn76489.att[2]);
-	printf("Noise ctrl: 0x%x\033[K\n", regmap_sn76489.noise_ctrl);
-	printf("Noise att : 0x%x\033[K\n", regmap_sn76489.noise_att);
-
-	printf("\033[K\n\033[K\n");
 }
 
 void RetroWavePlayer::osd_show_regmaps() {
@@ -180,11 +296,14 @@ void RetroWavePlayer::osd_show() {
 
 	printf("\n");
 
+	double last_slept_msecs = (double)last_slept_usecs / 1000000.0;
+	double fps = 1000.0 / last_slept_msecs;
+
 	if (total_samples) {
 		auto [th, tm, ts] = sec2hms(total_samples / sample_rate);
-		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d +%011.6lfms (%zu/%zu %s+%05zu\033[0m)\033[K\n", h, m, s, th, tm, ts, ((double)last_slept_usecs / 1000000.0), played_samples, total_samples, samples_color, last_slept_samples);
+		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d +%011.6lfms (%zu/%zu %s+%05zu\033[0m %06.3lf)\033[K\n", h, m, s, th, tm, ts, last_slept_msecs, played_samples, total_samples, samples_color, last_slept_samples, fps);
 	} else {
-		printf("Playing: %02d:%02d:%02d +%011.6lfms (%zu %s+%05zu\033[0m)\033[K\n", h, m, s, ((double)last_slept_usecs / 1000000.0), played_samples, samples_color, last_slept_samples);
+		printf("Playing: %02d:%02d:%02d +%011.6lfms (%zu %s+%05zu\033[0m %06.3lf)\033[K\n", h, m, s, last_slept_msecs, played_samples, samples_color, last_slept_samples, fps);
 	}
 
 	last_last_slept_samples = last_slept_samples;

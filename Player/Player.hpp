@@ -64,6 +64,21 @@
 #define RETROWAVE_PLAYER_TIME_REF	CLOCK_MONOTONIC
 #endif
 
+
+typedef struct {
+	bool used;
+
+	bool is_latch, is_volume;
+	uint8_t channel, data;
+
+	uint8_t last_reg;
+
+	uint8_t noise_ctrl;
+	uint8_t att[4];
+	uint16_t freq[3];
+
+} SN76489Registers;
+
 class RetroWavePlayer {
 public:
 	enum {
@@ -89,14 +104,8 @@ public:
 	// RegMap
 	std::map<int, std::unordered_set<uint16_t>> reg_map_refreshed_list;
 	std::map<int, std::vector<uint8_t>> reg_map;
-	struct {
-		bool used;
 
-		uint8_t last_reg;
-		uint8_t att[3];
-		uint16_t freq[3];
-		uint8_t noise_att, noise_ctrl;
-	} regmap_sn76489 = {0};
+	SN76489Registers regmap_sn76489[2]{};
 
 	// OSD
 	int osd_show_regs = 1, osd_show_meta = 1;
@@ -112,6 +121,7 @@ public:
 	size_t played_bytes = 0, last_secs = 0, bytes_per_sec = 0;
 	uint64_t last_slept_usecs = 0;
 	bool playback_done = false;
+	bool sn76489_dual = false;
 
 	// Metadata
 	TinyVGMGd3Info gd3_info = {0};
@@ -146,7 +156,7 @@ public:
 
 	// RegMap
 	void regmap_insert(int idx, uint8_t reg, uint8_t val);
-	void regmap_sn76489_insert(uint8_t data);
+	void regmap_sn76489_insert(uint8_t chip_idx, uint8_t data);
 
 	// OSD
 	static void term_clear();
@@ -179,6 +189,7 @@ public:
 	void flush_chips();
 
 	static int callback_header_total_samples(void *userp, uint8_t value, const void *buf, uint32_t len);
+	static int callback_header_sn76489(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_header_done(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_playback_done(void *userp, uint8_t value, const void *buf, uint32_t len);
 
@@ -194,6 +205,10 @@ public:
 	static int callback_sleep_62(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_sleep_63(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_sleep_7n(void *userp, uint8_t value, const void *buf, uint32_t len);
+
+
+	void sn76489_zero_freq_workaround(uint8_t idx);
+
 
 	static timespec nsec_to_timespec(uint64_t nsec);
 	static void timespec_add(timespec &addee, timespec adder);

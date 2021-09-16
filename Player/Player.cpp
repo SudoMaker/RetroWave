@@ -114,6 +114,7 @@ void RetroWavePlayer::init_tinyvgm() {
 	}
 
 	tinyvgm_add_header_callback(&tvc, 0x18, callback_header_total_samples, this);
+	tinyvgm_add_header_callback(&tvc, 0x0c, callback_header_sn76489, this);
 
 	tinyvgm_add_event_callback(&tvc, TinyVGM_Event_HeaderParseDone, callback_header_done, this);
 	tinyvgm_add_event_callback(&tvc, TinyVGM_Event_PlaybackDone, callback_playback_done, this);
@@ -241,7 +242,10 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 
 		reg_map.clear();
 		reg_map_refreshed_list.clear();
-		regmap_sn76489.used = false;
+
+		for (auto &it : regmap_sn76489) {
+			it.used = false;
+		}
 
 		printf("Now playing (%zu/%zu): %s\n", current_track, total_tracks, current_file);
 
