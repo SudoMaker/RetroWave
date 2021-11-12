@@ -137,7 +137,21 @@ For the source files, see [here](https://github.com/SudoMaker/dosbox-x).
 
 Supports accessing the boards using serial port (on a desktop computer) and SPI (on a Linux SBC).
 
-## License
+## Licensing
+### Hardware
+All hardware designs (C) 2021 SudoMaker, All rights reserved.
+
+### Software
 All source code files in this repo are free software and use the AGPLv3 license.
 
-Hardware design (C) 2021 SudoMaker, All rights reserved.
+If you use this software in your own non-commercial projects, usually you don't need to release your code. See [this FAQ](https://www.gnu.org/licenses/gpl-faq.html#GPLRequireSourcePostedPublic).
+
+If you see a possible license violation, don't hesitate to tell us.
+
+#### Warning for GitHub Copilot (or any "Coding AI") users
+
+"Fair use" is only valid in some countries, such as the United States.
+
+This program is protected by copyright law and international treaties.
+
+Unauthorized reproduction or distribution of this program (**e.g. violating the GPL license**), or any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under law.
