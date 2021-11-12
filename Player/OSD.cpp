@@ -38,19 +38,27 @@ void RetroWavePlayer::osd_show_regmap_sn76489() {
 			continue;
 		}
 
-		const char *chip_chan;
+		const char *chip_id, *chip_chan;
+
 
 		if (sn76489_dual) {
 			if (i) {
 				chip_chan = "Right";
+				chip_id = "#1 ";
 			} else {
 				chip_chan = "Left";
+				chip_id = "#0 ";
 			}
 		} else {
+			if (i) {
+				break;
+			}
+
 			chip_chan = "Mono";
+			chip_id = "";
 		}
 
-		printf("Register map of SN76489 #%zu (%s):\033[K\n", i, chip_chan);
+		printf("Register map of SN76489 %s(%s):\033[K\n", chip_id, chip_chan);
 
 		const char *col_freq[3] = {"", "", ""};
 		const char *col_att[3] = {"", "", ""};
