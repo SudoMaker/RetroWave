@@ -46,7 +46,6 @@ if(${RETROWAVE_BUILD_PLAYER} EQUAL 1)
             NAME cxxopts
             GITHUB_REPOSITORY jarro2783/cxxopts
             VERSION 3.0.0
-            GIT_TAG df229cff0d5b96e146f3f11441f714e8e240cad0
             GIT_SHALLOW ON
     )
 
