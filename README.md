@@ -1,4 +1,8 @@
 # RetroWave
+
+
+[![Build Status](https://github.com/SudoMaker/RetroWave/workflows/Build/badge.svg)](https://github.com/SudoMaker/RetroWave/actions/workflows/push_pr_build_cmake.yml) [![Release Status](https://github.com/SudoMaker/RetroWave/workflows/Release/badge.svg)](https://github.com/SudoMaker/RetroWave/actions/workflows/release_cmake.yml)
+
 Authentic sounds from vintage sound chips, on modern hardware!
 
 ## Introduction
