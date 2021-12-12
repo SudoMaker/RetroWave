@@ -24,7 +24,7 @@ add_library(
 
 target_include_directories(RetroWave INTERFACE .)
 
-set(RETROWAVE_BUILD_PLAYER -1)
+set(RETROWAVE_BUILD_PLAYER -1 CACHE STRING "Set this to 0 to disable the player.")
 
 if(${RETROWAVE_BUILD_PLAYER} EQUAL -1)
     message("-- Note: Building the player by default. This requires additional dependencies. Use -DRETROWAVE_BUILD_PLAYER=0 to disable.")
