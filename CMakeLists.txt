@@ -30,6 +30,8 @@ add_library(
 
 target_include_directories(RetroWave INTERFACE .)
 
+set_target_properties(RetroWave PROPERTIES OUTPUT_NAME "retrowave")
+
 install(FILES RetroWaveLib/RetroWave.h DESTINATION include/RetroWaveLib)
 install(FILES ${RETROWAVE_BOARD_HEADERS} DESTINATION include/RetroWaveLib/Board)
 install(FILES ${RETROWAVE_PLATFORM_HEADERS} DESTINATION include/RetroWaveLib/Platform)
