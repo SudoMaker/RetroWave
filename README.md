@@ -12,9 +12,9 @@ They **were** in shape of Raspberry HATs, stackable, hackable, can be used on ti
 
 Since 2022-06, the original RetroWave series are no longer produced. You can read about what happened in [this article](https://telegra.ph/What-happened-to-RetroWave-OPL3-06-21).
 
-The successors of the original RetroWave series is called the **RetroWave Express** series. They are available in discrete boards each with its own USB port. For now, only the [RetroWave OPL3 Express](https://shop.sudomaker.com/products/retrowave-opl3-express) is available.
+![retrowave-rip](https://user-images.githubusercontent.com/34613827/193454548-e8c173dc-f7c6-4bcd-b5ee-31df4d3ce758.jpg)
 
-![pic2](https://user-images.githubusercontent.com/34613827/115403406-f2bb1e80-a21e-11eb-870d-8f872d3b3b86.jpg)
+The successors of the original RetroWave series is called the **RetroWave Express** series. They are available in discrete boards each with its own USB port. For now, only the [RetroWave OPL3 Express](https://shop.sudomaker.com/products/retrowave-opl3-express) is available.
 
 ## Hardware
 
@@ -26,7 +26,7 @@ Available on our official [Shopify Shop](https://shop.sudomaker.com/products/ret
 Uses the Yamaha YMF262-M chip.
 
 #### OPL3
-No longer available. [Why?](https://telegra.ph/What-happened-to-RetroWave-OPL3-06-21)
+No longer available, as mentioned above.
 
 Uses the Yamaha YMF262-M chip.
 
@@ -38,7 +38,7 @@ Under development.
 #### MasterGear
 Under development.
 
-... And there will be more ...
+... And there will be more ... are there?
 
 ### Features
 - High quality components
