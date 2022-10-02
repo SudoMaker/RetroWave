@@ -6,7 +6,7 @@
 Authentic sounds from vintage sound chips, on modern hardware!
 
 ## Introduction
-RetroWave is **originally** a hardware sound board series that uses vintage sound chips and works with modern hardware.
+RetroWave is a hardware sound board series that uses vintage sound chips and works with modern hardware.
 
 They **were** in shape of Raspberry HATs, stackable, hackable, can be used on tiny single board computers like the Raspberry Pi / Jetson Nano, and modern desktop computer with USB ports.
 
@@ -14,9 +14,17 @@ Since 2022-06, the original RetroWave series are no longer produced. You can rea
 
 ![retrowave-rip](https://user-images.githubusercontent.com/34613827/193454548-e8c173dc-f7c6-4bcd-b5ee-31df4d3ce758.jpg)
 
-The successors of the original RetroWave series is called the **RetroWave Express** series. They are available in discrete boards each with its own USB port. For now, only the [RetroWave OPL3 Express](https://shop.sudomaker.com/products/retrowave-opl3-express) is available.
+The successors of the original RetroWave series is called the **RetroWave Express** series. They are available in discrete boards each with its own USB port. 100% software compatibility of the original RetroWave series is maintained.
+
+For now, only the [RetroWave OPL3 Express](https://shop.sudomaker.com/products/retrowave-opl3-express) is available.
 
 ## Hardware
+For the information of the original RetroWave series, check the history.
+
+### Features
+- Minimalistic form factor and convenient USB-C interface
+- Designed with high-grade components for everyday use
+- Ultra-high bandwidth provided by hardware 8080 ports
 
 ### Boards
 
@@ -25,56 +33,13 @@ Available on our official [Shopify Shop](https://shop.sudomaker.com/products/ret
 
 Uses the Yamaha YMF262-M chip.
 
-#### OPL3
-No longer available, as mentioned above.
-
-Uses the Yamaha YMF262-M chip.
-
-![EE4A0701](https://user-images.githubusercontent.com/34613827/115404127-9b697e00-a21f-11eb-9cce-84bf7765dd9a.jpg)
-
-#### Mini Blaster
-Under development.
-
-#### MasterGear
-Under development.
 
 ... And there will be more ... are there?
 
-### Features
-- High quality components
-- In shape of a Raspberry HAT
-- Uses SPI, a modern high-speed bus
-- All control pins & chip registers are directly accessible by software
-- Built-in crystal oscillator, no need to use an MCU
-- Different RetroWave boards can be stacked together, and they use the same pins
-- With a PotatoPi Lite as a USB adapter, the boards can be accessed via 12Mbps full speed USB CDC
-
-### In depth look
-
-#### Architecture
-There are no abstraction between software and hardware at all.
-
-A simple SPI IO expander is used, and all pins of the sound chips can be controlled by software directly.
-
-With the PotatoPi Lite as USB adapter, you still have the ability to control all the pins directly. Since it just acts as simple "Serial to SPI" converter.
-
-All boards have built-in crystal oscillators. For sound chips that can be used with different clock speeds, programmable oscillators will be used.
-
-#### Pin allocation
-Each board uses the same pins on the 40 pin Raspberry header (physical pin numbering):
-- 5V (pin 2 and 4)
-- All GND pins (pin 6, 9, 14, 20, 25, 30, 24, 39)
-- SPI MOSI (pin 19)
-- SPI MISO (pin 21)
-- SPI CLK (pin 23)
-- GPIO6 (pin 31)
-
-Yes, the boards are stackable. And yes, different boards can function at the same time.
-
 ## Software
-We provide a library for accessing the boards, a reference command-line VGM player that uses the library, and a modified DOSBox-X that supports using RetroWave boards for sound output.
+The RetroWave OPL3 (Express) is supported by [DOSBox-X](https://dosbox-x.com/). The support is also ported to 86Box [by community](https://github.com/daemon32/86Box/).
 
-The firmware of the USB Adapter is also open sourced: See [here](https://github.com/SudoMaker/RetroWave_USB_Adapter).
+For experienced users, we provide a library for accessing the boards, a reference command-line VGM player that uses the library.
 
 All of them are free software.
 
@@ -137,18 +102,10 @@ If you are good at Windows APIs, feel free to create a pull request!
 
    The conhost.exe terminal is extremely laggy when repainting the whole console window. So, OSD refresh rate is set to 1 second and regmap visualization is disabled by default on Windows. If you want to see the register map visualization properly, try using MinTTY as your terminal.
 
-### DOSBox-X
-![Screenshot_20210420_004920](https://user-images.githubusercontent.com/34613827/115405808-2a2aca80-a221-11eb-8a16-93d76cd51b71.png)
-
-Currently only OPL3 is supported.
-
-For the source files, see [here](https://github.com/SudoMaker/dosbox-x).
-
-Supports accessing the boards using serial port (on a desktop computer) and SPI (on a Linux SBC).
 
 ## Licensing
 ### Hardware
-All hardware designs (C) 2021 SudoMaker, All rights reserved.
+All hardware designs (C) 2021-2022 SudoMaker, All rights reserved.
 
 ### Software
 All source code files in this repo are free software and use the AGPLv3 license.
