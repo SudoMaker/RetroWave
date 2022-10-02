@@ -6,22 +6,27 @@
 Authentic sounds from vintage sound chips, on modern hardware!
 
 ## Introduction
-RetroWave is a hardware sound board series that uses vintage sound chips and works with modern hardware.
+RetroWave is **originally** a hardware sound board series that uses vintage sound chips and works with modern hardware.
 
-They are in shape of Raspberry HATs, stackable, hackable, can be used on tiny single board computers like the Raspberry Pi / Jetson Nano, and modern desktop computer with USB ports.
+They **were** in shape of Raspberry HATs, stackable, hackable, can be used on tiny single board computers like the Raspberry Pi / Jetson Nano, and modern desktop computer with USB ports.
+
+Since 2022-06, the original RetroWave series are no longer produced. You can read about what happened in [this article](https://telegra.ph/What-happened-to-RetroWave-OPL3-06-21).
+
+The successors of the original RetroWave series is called the **RetroWave Express** series. They are available in discrete boards each with its own USB port. For now, only the [RetroWave OPL3 Express](https://shop.sudomaker.com/products/retrowave-opl3-express) is available.
 
 ![pic2](https://user-images.githubusercontent.com/34613827/115403406-f2bb1e80-a21e-11eb-870d-8f872d3b3b86.jpg)
-
-![pic3](https://user-images.githubusercontent.com/34613827/115403614-2ac26180-a21f-11eb-85a6-18b21e8c10ba.jpg)
-
-![pic1](https://user-images.githubusercontent.com/34613827/115405273-acff5580-a220-11eb-9b1d-b16763f35a67.jpg)
 
 ## Hardware
 
 ### Boards
 
+#### OPL3 Express
+Available on our official [Shopify Shop](https://shop.sudomaker.com/products/retrowave-opl3-express).
+
+Uses the Yamaha YMF262-M chip.
+
 #### OPL3
-Now available on [Tindie](https://www.tindie.com/products/sudomaker/retrowave-opl3-sound-card/).
+No longer available. [Why?](https://telegra.ph/What-happened-to-RetroWave-OPL3-06-21)
 
 Uses the Yamaha YMF262-M chip.
 
