@@ -236,6 +236,7 @@ public:
 
 	static timespec nsec_to_timespec(uint64_t nsec);
 	static void timespec_add(timespec &addee, timespec adder);
+	static int timespec_cmp(timespec a, timespec b);
 
 	int flush_and_sleep(uint32_t sleep_samples);
 };

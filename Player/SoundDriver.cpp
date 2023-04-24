@@ -321,11 +321,14 @@ check_command:
 #ifdef __APPLE__
 	struct timespec time_now;
 	clock_gettime(RETROWAVE_PLAYER_TIME_REF, &time_now);
-	uint64_t sleep_diff = (sleep_end.tv_sec - time_now.tv_sec) * 1000000000 + (sleep_end.tv_nsec - time_now.tv_nsec);
-	mach_timebase_info_data_t timebase_info;
 
-	mach_timebase_info(&timebase_info);
-	mach_wait_until(mach_absolute_time() + sleep_diff * timebase_info.denom / timebase_info.numer);
+	if (timespec_cmp(time_now, sleep_end) < 0) {
+		uint64_t sleep_diff = (sleep_end.tv_sec - time_now.tv_sec) * 1000000000 + (sleep_end.tv_nsec - time_now.tv_nsec);
+		mach_timebase_info_data_t timebase_info;
+
+		mach_timebase_info(&timebase_info);
+		mach_wait_until(mach_absolute_time() + sleep_diff * timebase_info.denom / timebase_info.numer);
+	}
 #else
 	clock_nanosleep(RETROWAVE_PLAYER_TIME_REF, TIMER_ABSTIME, &sleep_end, nullptr);
 #endif
@@ -348,6 +351,20 @@ void RetroWavePlayer::timespec_add(timespec &addee, timespec adder) {
 	if (addee.tv_nsec > 999999999) {
 		addee.tv_sec += 1;
 		addee.tv_nsec -= 999999999;
+	}
+}
+
+int RetroWavePlayer::timespec_cmp(timespec a, timespec b) {
+	if (a.tv_sec > b.tv_sec) {
+		return 1;
+	} else if (a.tv_sec < b.tv_sec) {
+		return -1;
+	} else if (a.tv_nsec > b.tv_nsec) {
+		return 1;
+	} else if (a.tv_nsec < b.tv_nsec) {
+		return -1;
+	} else {
+		return 0;
 	}
 }
 
