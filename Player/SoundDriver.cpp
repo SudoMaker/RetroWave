@@ -344,7 +344,7 @@ timespec RetroWavePlayer::nsec_to_timespec(uint64_t nsec) {
 	return ret;
 }
 
-void RetroWavePlayer::timespec_add(timespec &addee, timespec adder) {
+void RetroWavePlayer::timespec_add(timespec &addee, const timespec &adder) {
 	addee.tv_sec += adder.tv_sec;
 	addee.tv_nsec += adder.tv_nsec;
 
@@ -354,7 +354,7 @@ void RetroWavePlayer::timespec_add(timespec &addee, timespec adder) {
 	}
 }
 
-int RetroWavePlayer::timespec_cmp(timespec a, timespec b) {
+int RetroWavePlayer::timespec_cmp(const timespec &a, const timespec &b) {
 	if (a.tv_sec > b.tv_sec) {
 		return 1;
 	} else if (a.tv_sec < b.tv_sec) {
@@ -367,10 +367,3 @@ int RetroWavePlayer::timespec_cmp(timespec a, timespec b) {
 		return 0;
 	}
 }
-
-
-
-
-
-
-

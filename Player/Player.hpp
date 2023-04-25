@@ -230,13 +230,11 @@ public:
 	static int callback_sleep_63(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_sleep_7n(void *userp, uint8_t value, const void *buf, uint32_t len);
 
-
 	void sn76489_zero_freq_workaround(uint8_t idx);
 
-
 	static timespec nsec_to_timespec(uint64_t nsec);
-	static void timespec_add(timespec &addee, timespec adder);
-	static int timespec_cmp(timespec a, timespec b);
+	static void timespec_add(timespec &addee, const timespec &adder);
+	static int timespec_cmp(const timespec &a, const timespec &b);
 
 	int flush_and_sleep(uint32_t sleep_samples);
 };
