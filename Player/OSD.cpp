@@ -334,9 +334,9 @@ void RetroWavePlayer::osd_show() {
 
 	if (total_samples) {
 		auto [th, tm, ts] = sec2hms(total_samples / sample_rate);
-		printf("Playing: %02d:%02d:%02d / %02d:%02d:%02d +%011.6lfms (%zu/%zu %s+%05zu\033[0m %06.3lf)\033[K\n", h, m, s, th, tm, ts, last_slept_msecs, played_samples, total_samples, samples_color, last_slept_samples, fps);
+		printf("Playing: %02zu:%02zu:%02zu / %02zu:%02zu:%02zu +%011.6lfms (%zu/%zu %s+%05zu\033[0m %06.3lf)\033[K\n", h, m, s, th, tm, ts, last_slept_msecs, played_samples, total_samples, samples_color, last_slept_samples, fps);
 	} else {
-		printf("Playing: %02d:%02d:%02d +%011.6lfms (%zu %s+%05zu\033[0m %06.3lf)\033[K\n", h, m, s, last_slept_msecs, played_samples, samples_color, last_slept_samples, fps);
+		printf("Playing: %02zu:%02zu:%02zu +%011.6lfms (%zu %s+%05zu\033[0m %06.3lf)\033[K\n", h, m, s, last_slept_msecs, played_samples, samples_color, last_slept_samples, fps);
 	}
 
 	last_last_slept_samples = last_slept_samples;
