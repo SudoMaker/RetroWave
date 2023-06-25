@@ -390,6 +390,9 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 				i = file_list.size();
 				playback_reset();
 				break;
+			default:
+				i++;
+				break;
 		}
 
 		key_command = NONE;
