@@ -126,6 +126,8 @@ static int tvc_callback_command(void *userp, unsigned int cmd, const void *buf, 
 
 	if (t->disabled_vgm_commands.count(cmd)) return TinyVGM_OK;
 
+	t->queued_bytes += cmd_val_len;
+
 	switch (cmd)
 	{
 		case 0x5a: return RetroWavePlayer::callback_opl2          (userp, cmd, buf, cmd_val_len);
@@ -137,6 +139,7 @@ static int tvc_callback_command(void *userp, unsigned int cmd, const void *buf, 
 		case 0x51: return RetroWavePlayer::callback_ym2413        (userp, cmd, buf, cmd_val_len);
 		case 0x30: return RetroWavePlayer::callback_sn76489_port1 (userp, cmd, buf, cmd_val_len);
 	}
+
 
 	return TinyVGM_OK; // ignore command
 }
@@ -403,7 +406,7 @@ void RetroWavePlayer::playback_reset() {
 	last_last_slept_samples = 0;
 	total_samples = 0;
 	last_slept_usecs = 0;
-	played_bytes = 0;
+	queued_bytes = 0;
 	last_secs = 0;
 
 	metadata = Metadata(); // reset all pointers back to NULL

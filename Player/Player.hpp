@@ -143,7 +143,7 @@ public:
 
 	// Playback stats
 	size_t played_samples = 0, last_slept_samples = 0, last_last_slept_samples = 0, total_samples = 0;
-	size_t played_bytes = 0, last_secs = 0, bytes_per_sec = 0;
+	size_t queued_bytes = 0, last_secs = 0, bytes_per_sec = 0;
 	uint64_t last_slept_usecs = 0;
 	bool sn76489_dual = false;
 

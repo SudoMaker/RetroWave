@@ -55,6 +55,8 @@ if(${RETROWAVE_BUILD_PLAYER} EQUAL 1)
 
     include(${CPM_DOWNLOAD_LOCATION})
 
+    add_definitions(-DTinyVGM_DEBUG=0)
+
     CPMAddPackage(
             NAME cxxopts
             GITHUB_REPOSITORY jarro2783/cxxopts

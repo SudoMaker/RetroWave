@@ -320,8 +320,8 @@ void RetroWavePlayer::osd_show() {
 	}
 
 	if (s - last_secs >= 1) {
-		bytes_per_sec = played_bytes;
-		played_bytes = 0;
+		bytes_per_sec = queued_bytes;
+		queued_bytes = 0;
 		last_secs = s;
 	}
 

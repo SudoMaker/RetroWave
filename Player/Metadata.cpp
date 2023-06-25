@@ -45,28 +45,6 @@
 
 #include "Player.hpp"
 
-//void RetroWavePlayer::char16_to_string(std::string &str, int16_t *c16) {
-//	str.clear();
-//
-//	auto cd = iconv_open("UTF8", "UTF16LE");
-//
-//	assert(cd);
-//
-//	size_t len_in = (tinyvgm_strlen16(c16) + 1) * 2;
-//	size_t len_out = len_in * 2;
-//
-//	char *outbuf = (char *)alloca(len_out);
-//	memset(outbuf, 0, len_out);
-//
-//	char *inptr = (char *)c16;
-//	char *outptr = outbuf;
-//
-//	iconv(cd, &inptr, &len_in, &outptr, &len_out);
-//
-//	str = outbuf;
-//	iconv_close(cd);
-//}
-
 void RetroWavePlayer::char16_to_string(std::string &str, int16_t *c16, uint32_t memsize) {
 	str.clear();
 
@@ -82,21 +60,4 @@ void RetroWavePlayer::char16_to_string(std::string &str, int16_t *c16, uint32_t 
 
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert;
 	str = convert.to_bytes(source);
-//
-//	size_t buflen_in = (c16_len + 1) * 2;
-//
-//
-////	std::locale loc("C");
-//	auto& f = std::use_facet<std::codecvt<char16_t, char, std::mbstate_t>>(std::locale());
-//
-//	std::mbstate_t mb{}; // initial shift state
-//	str.resize(buflen_in * 2);
-//
-//	const char16_t* from_next;
-//	char* to_next;
-//
-//	f.out(mb, reinterpret_cast<const char16_t *>(c16), reinterpret_cast<const char16_t *>(c16 + c16_len),
-//	     from_next, &str[0], &str[str.size()], to_next);
-//
-//	str.resize(to_next - &str[0]);
 }
