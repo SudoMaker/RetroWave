@@ -48,7 +48,7 @@
 void RetroWavePlayer::regmap_insert(int idx, uint8_t reg, uint8_t val) {
 	auto &v = reg_map[idx];
 	if (v.size() < (reg+1)) {
-		v.resize(reg+1);
+		v.resize((reg+1+15) & ~15); // round up to nearest 16, so that osd_show_regmaps() does not access invalid memory
 	}
 
 	v[reg] = val;
@@ -60,7 +60,6 @@ void RetroWavePlayer::regmap_sn76489_insert(uint8_t chip_idx, uint8_t data) {
 	auto &cur_regmap = regmap_sn76489[chip_idx];
 
 	cur_regmap.used = true;
-
 
 	cur_regmap.is_latch = (data >> 7) & 0x1;
 
