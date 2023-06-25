@@ -67,13 +67,13 @@
 //	iconv_close(cd);
 //}
 
-void RetroWavePlayer::char16_to_string(std::string &str, int16_t *c16) {
+void RetroWavePlayer::char16_to_string(std::string &str, int16_t *c16, uint32_t memsize) {
 	str.clear();
 
 	if (!c16)
 		return;
 
-	size_t c16_len = tinyvgm_strlen16(c16);
+	size_t c16_len = memsize / 2;
 
 	if (!c16_len)
 		return;
@@ -99,19 +99,4 @@ void RetroWavePlayer::char16_to_string(std::string &str, int16_t *c16) {
 //	     from_next, &str[0], &str[str.size()], to_next);
 //
 //	str.resize(to_next - &str[0]);
-}
-
-void RetroWavePlayer::gd3_to_info(TinyVGMGd3Info *g) {
-	char16_to_string(metadata.title, g->title);
-	char16_to_string(metadata.album, g->album);
-	char16_to_string(metadata.system_name, g->system_name);
-	char16_to_string(metadata.composer, g->composer);
-	char16_to_string(metadata.release_date, g->release_date);
-	char16_to_string(metadata.converter, g->converter);
-	char16_to_string(metadata.note, g->note);
-
-	char16_to_string(metadata.title_jp, g->title_jp);
-	char16_to_string(metadata.album_jp, g->album_jp);
-	char16_to_string(metadata.system_name_jp, g->system_name_jp);
-	char16_to_string(metadata.composer_jp, g->composer_jp);
 }

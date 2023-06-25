@@ -47,6 +47,7 @@
 
 static std::unordered_map<int, std::string_view> regmap_name = {
 	{0x5a, "OPL2"},
+	{0xaa, "OPL2 dual"},
 	{0x5e, "OPL3 Port0"},
 	{0x5f, "OPL3 Port1"},
 	{0x50, "SN76489"},

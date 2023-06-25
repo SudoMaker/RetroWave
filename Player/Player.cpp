@@ -44,6 +44,7 @@
 */
 
 #include "Player.hpp"
+#include <string.h>
 
 RetroWavePlayer player;
 
@@ -96,52 +97,129 @@ void RetroWavePlayer::init_retrowave() {
 	usleep(200 * 1000);
 }
 
+static int tvc_callback_command(void *userp, unsigned int cmd, const void *buf, uint32_t cmd_val_len)
+{
+	auto t = (RetroWavePlayer *)userp;
+
+	switch (cmd)
+	{
+		case 0x61: return RetroWavePlayer::callback_sleep     (userp, cmd, buf, cmd_val_len);
+		case 0x62: return RetroWavePlayer::callback_sleep_62  (userp, cmd, buf, cmd_val_len);
+		case 0x63: return RetroWavePlayer::callback_sleep_63  (userp, cmd, buf, cmd_val_len);
+		case 0x70: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x71: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x72: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x73: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x74: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x75: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x76: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x77: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x78: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x79: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x7a: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x7b: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x7c: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x7d: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x7e: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+		case 0x7f: return RetroWavePlayer::callback_sleep_7n  (userp, cmd, buf, cmd_val_len);
+	}
+
+	if (t->disabled_vgm_commands.count(cmd)) return TinyVGM_OK;
+
+	switch (cmd)
+	{
+		case 0x5a: return RetroWavePlayer::callback_opl2          (userp, cmd, buf, cmd_val_len);
+		case 0xaa: return RetroWavePlayer::callback_opl2_dual     (userp, cmd, buf, cmd_val_len);
+		case 0x5e: return RetroWavePlayer::callback_opl3_port0    (userp, cmd, buf, cmd_val_len);
+		case 0x5f: return RetroWavePlayer::callback_opl3_port1    (userp, cmd, buf, cmd_val_len);
+		case 0xbd: return RetroWavePlayer::callback_saa1099       (userp, cmd, buf, cmd_val_len);
+		case 0x50: return RetroWavePlayer::callback_sn76489_port0 (userp, cmd, buf, cmd_val_len);
+		case 0x51: return RetroWavePlayer::callback_ym2413        (userp, cmd, buf, cmd_val_len);
+		case 0x30: return RetroWavePlayer::callback_sn76489_port1 (userp, cmd, buf, cmd_val_len);
+	}
+
+	return TinyVGM_OK; // ignore command
+}
+
+static int tvc_callback_header(void *userp, TinyVGMHeaderField field, uint32_t value)
+{
+	auto t = (RetroWavePlayer *)userp;
+
+	switch (field)
+	{
+		case TinyVGM_HeaderField_Total_Samples: return RetroWavePlayer::callback_header_total_samples (userp, value);
+		case TinyVGM_HeaderField_SN76489_Clock: return RetroWavePlayer::callback_header_sn76489       (userp, value);
+		case TinyVGM_HeaderField_GD3_Offset:
+			t->gd3_offset_abs = value + tinyvgm_headerfield_offset(field);
+			break;
+		case TinyVGM_HeaderField_Data_Offset:
+			t->data_offset_abs = value + tinyvgm_headerfield_offset(field);
+			break;
+	}
+
+	return TinyVGM_OK; // ignore header
+}
+
+static int tvc_callback_metadata(void *userp, TinyVGMMetadataType field, uint32_t pos, uint32_t len)
+{
+	auto t = (RetroWavePlayer *)userp;
+
+#define X(F)    t->char16_to_string(t->metadata.F, (int16_t *)(t->file_buf.data() + pos), len);
+
+	switch (field)
+	{
+		case TinyVGM_MetadataType_Title_EN:      X(title);          break;
+		case TinyVGM_MetadataType_Title:         X(title_jp);       break;
+		case TinyVGM_MetadataType_Album_EN:      X(album);          break;
+		case TinyVGM_MetadataType_Album:         X(album_jp);       break;
+		case TinyVGM_MetadataType_SystemName_EN: X(system_name);    break;
+		case TinyVGM_MetadataType_SystemName:    X(system_name_jp); break;
+		case TinyVGM_MetadataType_Composer_EN:   X(composer);       break;
+		case TinyVGM_MetadataType_Composer:      X(composer_jp);    break;
+		case TinyVGM_MetadataType_ReleaseDate:   X(release_date);   break;
+		case TinyVGM_MetadataType_Converter:     X(converter);      break;
+		case TinyVGM_MetadataType_Notes:         X(note);           break;
+	}
+
+#undef X
+	return TinyVGM_OK;
+}
+
+int32_t tvc_callback_read(void *userp, uint8_t *buf, uint32_t len)
+{
+	auto t = (RetroWavePlayer *)userp;
+
+	if (t->file_pos >= t->file_buf.size())
+	{
+		return 0;
+	}
+
+	if (t->file_pos + len >= t->file_buf.size())
+	{
+		len = t->file_buf.size() - t->file_pos;
+	}
+	memcpy (buf, t->file_buf.data() + t->file_pos, len);
+	t->file_pos+=len;
+	return len;
+}
+
+int tvc_callback_seek(void *userp, uint32_t pos)
+{
+	auto t = (RetroWavePlayer *)userp;
+
+	t->file_pos = pos;
+
+	return 0;
+}
+
 void RetroWavePlayer::init_tinyvgm() {
-	tinyvgm_init(&tvc);
-
-	std::unordered_map<uint8_t, int (*)(void *, uint8_t, const void *, uint32_t)> cmd_cb_map = {
-		{0x5a, callback_opl2},
-		{0x5e, callback_opl3_port0},
-		{0x5f, callback_opl3_port1},
-		{0xbd, callback_saa1099},
-		{0x50, callback_sn76489_port0},
-		{0x51, callback_ym2413},
-		{0x30, callback_sn76489_port1},
-	};
-
-	for (auto &it : disabled_vgm_commands) {
-		cmd_cb_map.erase(it);
-		printf("info: disabled VGM command %02x\n", it);
-	}
-
-	for (auto &it : cmd_cb_map) {
-		tinyvgm_add_command_callback(&tvc, it.first, it.second, this);
-		printf("debug: VGM cmd %02x handler %p\n", it.first, it.second);
-	}
-
-//	tinyvgm_add_command_callback(&tvc, 0x5a, callback_opl2, this);
-//	tinyvgm_add_command_callback(&tvc, 0x5e, callback_opl3_port0, this);
-//	tinyvgm_add_command_callback(&tvc, 0x5f, callback_opl3_port1, this);
-//
-//	tinyvgm_add_command_callback(&tvc, 0xbd, callback_saa1099, this);
-//	tinyvgm_add_command_callback(&tvc, 0x50, callback_sn76489_port0, this);
-//	tinyvgm_add_command_callback(&tvc, 0x51, callback_ym2413, this);
-//	tinyvgm_add_command_callback(&tvc, 0x30, callback_sn76489_port1, this);
-
-
-	tinyvgm_add_command_callback(&tvc, 0x61, callback_sleep, this);
-	tinyvgm_add_command_callback(&tvc, 0x62, callback_sleep_62, this);
-	tinyvgm_add_command_callback(&tvc, 0x63, callback_sleep_63, this);
-
-	for (int i = 0x70; i <= 0x7f; i++) {
-		tinyvgm_add_command_callback(&tvc, i, callback_sleep_7n, this);
-	}
-
-	tinyvgm_add_header_callback(&tvc, 0x18, callback_header_total_samples, this);
-	tinyvgm_add_header_callback(&tvc, 0x0c, callback_header_sn76489, this);
-
-	tinyvgm_add_event_callback(&tvc, TinyVGM_Event_HeaderParseDone, callback_header_done, this);
-	tinyvgm_add_event_callback(&tvc, TinyVGM_Event_PlaybackDone, callback_playback_done, this);
+	memset (&tvc, 0, sizeof (tvc));
+	tvc.userp = this;
+	tvc.callback.header   = tvc_callback_header;
+	tvc.callback.metadata = tvc_callback_metadata;
+	tvc.callback.command  = tvc_callback_command;
+	tvc.callback.seek     = tvc_callback_seek;
+	tvc.callback.read     = tvc_callback_read;
 }
 
 void RetroWavePlayer::parse_disabled_vgm_commands(const std::string &str) {
@@ -164,6 +242,10 @@ void RetroWavePlayer::parse_disabled_vgm_commands(const std::string &str) {
 }
 
 bool RetroWavePlayer::load_file(const std::string &path) {
+	gd3_offset_abs = 0;
+	data_offset_abs = 0;
+	file_pos = 0;
+
 	int fd = open(path.c_str(), O_RDONLY);
 
 	if (fd < 0) {
@@ -278,60 +360,33 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 			continue;
 		}
 
-		int32_t rc_tv_parse, rc_gd3_parse;
-
-		rc_tv_parse = tinyvgm_parse(&tvc, file_buf.data(), 32);	// GD3 offset must be within first 32 bytes
-
-		if (rc_tv_parse == 32) {
-			auto gd3_offset = tvc.header_info.gd3_offset;
-			auto gd3_size = file_buf.size() - gd3_offset;
-
-			if (gd3_offset) {
-				tinyvgm_init_gd3(&gd3_info);
-				rc_gd3_parse = tinyvgm_parse_gd3(&gd3_info, file_buf.data()+gd3_offset, gd3_size);
-				if (rc_gd3_parse) {
-					gd3_to_info(&gd3_info);
-				}
-			}
-		} else {
-			printf("TinyVGM error: failed to process file `%s', rc=%d\n", cur_file.c_str(), rc_tv_parse);
-			tinyvgm_reset(&tvc);
+		if (tinyvgm_parse_header (&tvc) != TinyVGM_OK) {
 			i++;
 			continue;
 		}
 
-		const size_t parse_size_hint = 32;
-
-		for (size_t j=32; j<file_buf.size(); j+=parse_size_hint) {
-			size_t parse_size = parse_size_hint;
-
-			if (parse_size_hint + j > file_buf.size()) {
-				parse_size = file_buf.size() - j;
-			}
-
-			rc_tv_parse = tinyvgm_parse(&tvc, file_buf.data()+j, parse_size);
-
-			if (rc_tv_parse == INT32_MIN) {
-				printf("TinyVGM error: failed to process file `%s', rc=%d\n", cur_file.c_str(), rc_tv_parse);
-				break;
-			}
-
-			played_bytes += rc_tv_parse;
-
-			if (playback_done) {
-				break;
-			}
-
-			if (key_command & 0x0c) {
-				break;
+		if (gd3_offset_abs) {
+			if (tinyvgm_parse_metadata(&tvc, gd3_offset_abs) != TinyVGM_OK) {
+				// ignore errors
 			}
 		}
 
-		if (key_command == PREV) {
-			if (i)
-				i--;
-		} else {
-			i++;
+		callback_header_done(this);
+		tinyvgm_parse_commands(&tvc, data_offset_abs);
+
+		switch (key_command)
+		{
+			case PREV:
+				if (i)
+					i--;
+				break;
+			case NEXT:
+				i++;
+				break;
+			case QUIT:
+				i = file_list.size();
+				playback_reset();
+				break;
 		}
 
 		key_command = NONE;
@@ -343,7 +398,6 @@ void RetroWavePlayer::play(const std::vector<std::string> &file_list) {
 }
 
 void RetroWavePlayer::playback_reset() {
-	playback_done = false;
 	played_samples = 0;
 	last_slept_samples = 0;
 	last_last_slept_samples = 0;
@@ -352,9 +406,7 @@ void RetroWavePlayer::playback_reset() {
 	played_bytes = 0;
 	last_secs = 0;
 
-	metadata = Metadata();
-	tinyvgm_destroy_gd3(&gd3_info);
-	tinyvgm_reset(&tvc);
+	metadata = Metadata(); // reset all pointers back to NULL
 	reset_chips();
 	usleep(200 * 1000);
 }
