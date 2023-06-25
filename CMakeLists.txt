@@ -65,7 +65,8 @@ if(${RETROWAVE_BUILD_PLAYER} EQUAL 1)
     CPMAddPackage(
             NAME TinyVGM
             GITHUB_REPOSITORY SudoMaker/TinyVGM
-            VERSION 0.0.2
+            #VERSION v1.0.2
+            GIT_TAG a122a90f3ebacea7af25b92b183664dc5a3621e4
     )
 
     include_directories(${cxxopts_SOURCE_DIR}/include)

@@ -66,36 +66,26 @@ void RetroWavePlayer::flush_chips() {
 	retrowave_flush(&rtctx);
 }
 
-int RetroWavePlayer::callback_header_total_samples(void *userp, uint8_t value, const void *buf, uint32_t len) {
+int RetroWavePlayer::callback_header_total_samples(void *userp, uint32_t value) {
 	auto *ctx = (RetroWavePlayer *)userp;
 
-	assert(len == 4);
-	ctx->total_samples = *((uint32_t *) buf);
+	ctx->total_samples = value;
 
 	return TinyVGM_OK;
 }
 
-int RetroWavePlayer::callback_header_sn76489(void *userp, uint8_t value, const void *buf, uint32_t len) {
+int RetroWavePlayer::callback_header_sn76489(void *userp, uint32_t value) {
 	auto *ctx = (RetroWavePlayer *)userp;
 
-	assert(len == 4);
-	ctx->sn76489_dual = *((uint32_t *) buf) >> 31;
+	ctx->sn76489_dual = value >> 1;
 
 	return TinyVGM_OK;
 }
 
-int RetroWavePlayer::callback_header_done(void *userp, uint8_t value, const void *buf, uint32_t len) {
+int RetroWavePlayer::callback_header_done(void *userp) {
 	auto *ctx = (RetroWavePlayer *)userp;
 
 	clock_gettime(RETROWAVE_PLAYER_TIME_REF, &ctx->sleep_end);
-
-	return TinyVGM_OK;
-}
-
-int RetroWavePlayer::callback_playback_done(void *userp, uint8_t value, const void *buf, uint32_t len) {
-	auto *ctx = (RetroWavePlayer *)userp;
-
-	ctx->playback_done = true;
 
 	return TinyVGM_OK;
 }
@@ -125,6 +115,22 @@ int RetroWavePlayer::callback_opl2(void *userp, uint8_t value, const void *buf, 
 
 	ctx->regmap_insert(value, reg, val);
 	retrowave_opl3_queue_port0(&ctx->rtctx, reg, val);
+	ctx->single_frame_hook();
+
+
+	return TinyVGM_OK;
+}
+
+int RetroWavePlayer::callback_opl2_dual(void *userp, uint8_t value, const void *buf, uint32_t len) {
+	auto *ctx = (RetroWavePlayer *)userp;
+
+	assert(len == 2);
+
+	uint8_t reg = ((uint8_t *) buf)[0];
+	uint8_t val = ((uint8_t *) buf)[1];
+
+	ctx->regmap_insert(value, reg, val);
+	retrowave_opl3_queue_port1(&ctx->rtctx, reg, val);
 	ctx->single_frame_hook();
 
 
@@ -291,7 +297,7 @@ check_command:
 			break;
 		case NEXT:
 		case PREV:
-			return TinyVGM_NO;
+			return TinyVGM_ECANCELED;
 		case SINGLE_FRAME:
 			single_step = true;
 			break;

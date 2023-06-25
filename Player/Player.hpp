@@ -119,6 +119,7 @@ public:
 
 	// File I/O
 	std::vector<uint8_t> file_buf;
+	uint32_t file_pos;
 
 	// Controls
 	struct termios term_state;
@@ -144,11 +145,9 @@ public:
 	size_t played_samples = 0, last_slept_samples = 0, last_last_slept_samples = 0, total_samples = 0;
 	size_t played_bytes = 0, last_secs = 0, bytes_per_sec = 0;
 	uint64_t last_slept_usecs = 0;
-	bool playback_done = false;
 	bool sn76489_dual = false;
 
 	// Metadata
-	TinyVGMGd3Info gd3_info = {0};
 	struct Metadata {
 		std::string title, album, system_name, composer, release_date, converter, note;
 		std::string title_jp, album_jp, system_name_jp, composer_jp;
@@ -157,6 +156,8 @@ public:
 	timespec sleep_end;
 
 	TinyVGMContext tvc;
+	uint32_t gd3_offset_abs;
+	uint32_t data_offset_abs;
 	RetroWaveContext rtctx;
 
 	std::unordered_set<uint8_t> disabled_vgm_commands;
@@ -194,9 +195,7 @@ public:
 
 
 	// Metadata
-	static void char16_to_string(std::string& str, int16_t *c16);
-	void gd3_to_info(TinyVGMGd3Info *g);
-
+	static void char16_to_string(std::string& str, int16_t *c16, uint32_t memsize);
 
 	// Controls
 	static void term_attr_disable_buffering();
@@ -212,13 +211,13 @@ public:
 	void reset_chips();
 	void flush_chips();
 
-	static int callback_header_total_samples(void *userp, uint8_t value, const void *buf, uint32_t len);
-	static int callback_header_sn76489(void *userp, uint8_t value, const void *buf, uint32_t len);
-	static int callback_header_done(void *userp, uint8_t value, const void *buf, uint32_t len);
-	static int callback_playback_done(void *userp, uint8_t value, const void *buf, uint32_t len);
+	static int callback_header_total_samples(void *userp, uint32_t value);
+	static int callback_header_sn76489(void *userp, uint32_t value);
+	static int callback_header_done(void *userp);
 
 	static int callback_saa1099(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_opl2(void *userp, uint8_t value, const void *buf, uint32_t len);
+	static int callback_opl2_dual(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_opl3_port0(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_opl3_port1(void *userp, uint8_t value, const void *buf, uint32_t len);
 	static int callback_sn76489_port0(void *userp, uint8_t value, const void *buf, uint32_t len);
