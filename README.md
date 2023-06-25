@@ -12,8 +12,6 @@ They **were** in shape of Raspberry HATs, stackable, hackable, can be used on ti
 
 Since 2022-06, the original RetroWave series are no longer produced. You can read about what happened in [this article](https://telegra.ph/What-happened-to-RetroWave-OPL3-06-21).
 
-![retrowave-rip](https://user-images.githubusercontent.com/34613827/193454548-e8c173dc-f7c6-4bcd-b5ee-31df4d3ce758.jpg)
-
 The successors of the original RetroWave series is called the **RetroWave Express** series. They are available in discrete boards each with its own USB port. 100% software compatibility of the original RetroWave series is maintained.
 
 For now, only the [RetroWave OPL3 Express](https://shop.sudomaker.com/products/retrowave-opl3-express) is available.
