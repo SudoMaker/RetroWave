@@ -82,7 +82,7 @@ void retrowave_opl3_emit_port1(RetroWaveContext *ctx, uint8_t reg, uint8_t val) 
 }
 
 void retrowave_opl3_reset(RetroWaveContext *ctx) {
-	uint8_t buf[] = {RetroWave_Board_OPL3, 0x12, 0xfe};
+	uint8_t buf[] = {RetroWave_Board_OPL3, 0x12, 0xfe, 0x00};
 	ctx->callback_io(ctx->user_data, transfer_speed / 10, buf, NULL, sizeof(buf));
 	buf[2] = 0xff;
 	ctx->callback_io(ctx->user_data, transfer_speed / 10, buf, NULL, sizeof(buf));

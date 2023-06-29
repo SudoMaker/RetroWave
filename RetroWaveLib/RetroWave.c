@@ -61,7 +61,8 @@ void retrowave_io_init(RetroWaveContext *ctx) {
 	uint8_t init_sequence_1[] = {
 		0x00,
 		0x0a,	// IOCON register
-		0x28	// Enable: HAEN, SEQOP
+		0x28,	// Enable: HAEN, SEQOP
+		0x28
 	};
 
 	uint8_t init_sequence_2[] = {
