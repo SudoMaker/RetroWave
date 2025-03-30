@@ -62,6 +62,7 @@ void RetroWavePlayer::term_attr_load() {
 }
 
 int RetroWavePlayer::term_read_char() {
+#ifndef EMSCRIPTEN
 	uint8_t buf;
 	set_nonblocking(STDIN_FILENO);
 	ssize_t rc = read(STDIN_FILENO, &buf, 1);
@@ -70,6 +71,7 @@ int RetroWavePlayer::term_read_char() {
 	if (rc == 1)
 		return buf;
 	else
+#endif
 		return -1;
 }
 
