@@ -43,7 +43,7 @@
 
 #pragma once
 
-#if defined (EMSCRIPTEN)
+#ifdef EMSCRIPTEN
 
 #include <stdio.h>
 #include <stdlib.h>
