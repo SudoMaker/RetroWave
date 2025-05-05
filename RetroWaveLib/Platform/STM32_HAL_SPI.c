@@ -43,6 +43,8 @@
 
 #include "STM32_HAL_SPI.h"
 
+#ifndef EMSCRIPTEN
+
 extern void HAL_GPIO_WritePin(void *GPIOx, uint16_t GPIO_Pin, int PinState);
 extern int HAL_SPI_TransmitReceive(void *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout);
 
@@ -77,3 +79,4 @@ int retrowave_init_stm32_hal_spi(RetroWaveContext *ctx, void *hspi, void *cs_gpi
 void retrowave_deinit_stm32_hal_spi(RetroWaveContext *ctx) {
 	free(ctx->user_data);
 }
+#endif

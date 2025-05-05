@@ -79,7 +79,6 @@ if(${RETROWAVE_BUILD_PLAYER} EQUAL 1)
 
     if(EMSCRIPTEN)
         set_target_properties(RetroWave_Player PROPERTIES LINK_FLAGS "-sUSE_ZLIB=1 -sALLOW_MEMORY_GROWTH -sASYNCIFY -sENVIRONMENT=web")
-        set_target_properties(RetroWave_Player PROPERTIES COMPILE_FLAGS "-sUSE_ZLIB=1")
     endif()
     target_link_libraries(RetroWave_Player RetroWave TinyVGM z)
 endif()

@@ -49,6 +49,7 @@
 #include <inttypes.h>
 
 #include "../RetroWave.h"
+#ifndef EMSCRIPTEN
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,4 +66,5 @@ extern void retrowave_deinit_stm32_hal_spi(RetroWaveContext *ctx);
 
 #ifdef __cplusplus
 };
+#endif
 #endif
