@@ -1,7 +1,7 @@
 /*
     This file is part of RetroWave.
 
-    Copyright (C) 2021 ReimuNotMoe <reimu@sudomaker.com>
+    Copyright (C) 2025 Christian Kündig <christian@kuendig.info>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -43,28 +43,37 @@
 
 #pragma once
 
+#ifdef EMSCRIPTEN
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+
+#include <sys/ioctl.h>
+#include <sys/file.h>
+
+
 #include "../RetroWave.h"
-#ifndef EMSCRIPTEN
+#include "../Protocol/Serial.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-	void *hspi;
-	void *cs_gpiox;
-	uint16_t cs_gpio_pin;
-} RetroWavePlatform_STM32_HAL_SPI;
+} RetroWavePlatform_WebSerialPort; 
 
-extern int retrowave_init_stm32_hal_spi(RetroWaveContext *ctx, void *hspi, void *cs_gpiox, uint16_t cs_gpio_pin);
-extern void retrowave_deinit_stm32_hal_spi(RetroWaveContext *ctx);
+extern int retrowave_init_web_serialport(RetroWaveContext *ctx);
+extern void retrowave_deinit_web_serialport(RetroWaveContext *ctx);
 
 #ifdef __cplusplus
 };
 #endif
+
 #endif

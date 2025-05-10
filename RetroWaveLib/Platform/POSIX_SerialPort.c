@@ -44,7 +44,7 @@
 #include "POSIX_SerialPort.h"
 #include "assert.h"
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if (defined (__unix__) && !defined(EMSCRIPTEN)) || (defined (__APPLE__) && defined (__MACH__))
 
 static const char log_tag[] = "retrowave platform posix_serialport";
 

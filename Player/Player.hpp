@@ -71,8 +71,12 @@
 #include <zlib.h>
 
 #include <RetroWaveLib/RetroWave.h>
+#ifndef EMSCRIPTEN
 #include <RetroWaveLib/Platform/Linux_SPI.h>
 #include <RetroWaveLib/Platform/POSIX_SerialPort.h>
+#else
+#include <RetroWaveLib/Platform/Web_SerialPort.h>
+#endif
 #include <RetroWaveLib/Board/OPL3.h>
 #include <RetroWaveLib/Board/MiniBlaster.h>
 #include <RetroWaveLib/Board/MasterGear.h>

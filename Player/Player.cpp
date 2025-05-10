@@ -46,6 +46,11 @@
 #include "Player.hpp"
 #include <string.h>
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
+
 RetroWavePlayer player;
 
 std::tuple<size_t, size_t, size_t> RetroWavePlayer::sec2hms(size_t _secs) {
@@ -420,6 +425,9 @@ void RetroWavePlayer::playback_reset() {
 void RetroWavePlayer::do_exit(int rc) {
 	reset_chips();
 	term_attr_load();
+#ifdef EMSCRIPTEN
+	retrowave_deinit_web_serialport(&rtctx);
+#endif 
 	exit(rc);
 }
 
@@ -541,9 +549,15 @@ int main(int argc, char **argv) {
 		}
 #endif
 
+#ifndef EMSCRIPTEN
 		if (retrowave_init_posix_serialport(&player.rtctx, device_path.c_str())) {
 			exit(2);
 		}
+#else
+		if (retrowave_init_web_serialport(&player.rtctx)) {
+			exit(2);
+		}
+#endif
 	} else {
 		puts("Unsupported device type. Please read the help.");
 		exit(2);
@@ -611,7 +625,11 @@ int main(int argc, char **argv) {
 					"Press Ctrl-C to close program.\n"
 				);
 
+#ifndef EMSCRIPTEN
 				sleep(500);
+#else
+				emscripten_sleep(50000);
+#endif
 			}
 			},
 		};
